@@ -1,0 +1,388 @@
+<title>Alpha Beta Sigma</title>
+<meta name="description" content="Bist du Alpha, Beta oder Sigma? Oder fällst du komplett aus dem Spektrum?">
+<style>
+  /* Layout: einspaltiges, zentriertes Quiz auf dunklem "Testosteron-Poster"-Grund,
+     ein Screen zur Zeit (Intro → Frage → Ergebnis), große kondensierte Headlines. */
+  :root {
+    --bg: #0a0a0d;
+    --surface: #15151e;
+    --surface-2: #1d1d29;
+    --fg: #edecf3;
+    --muted: #8b8ba2;
+    --accent: #ff5a1f;      /* molten orange */
+    --accent-2: #ffb020;    /* gold */
+    --danger: #ff2d55;      /* durchgefallen */
+    --line: rgba(255,255,255,.1);
+    color-scheme: dark;
+    --maxw: 640px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, rgba(255,90,31,.14), transparent 60%),
+      radial-gradient(900px 500px at 50% 120%, rgba(255,45,85,.08), transparent 55%),
+      var(--bg);
+    color: var(--fg);
+    font-family: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.5;
+    min-height: 100%;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding-inline: 20px;
+    padding-block: clamp(28px, 7vw, 64px);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 22px;
+  }
+  .display {
+    font-family: "Anton", "Archivo", Impact, sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    line-height: .92;
+    text-wrap: balance;
+    margin: 0;
+  }
+  .eyebrow {
+    font-family: "Anton", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-size: 13px;
+    color: var(--accent);
+  }
+  .muted { color: var(--muted); }
+
+  /* --- Screens --- */
+  .screen { animation: rise .35s ease both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .screen { animation: none; } }
+
+  /* --- Intro --- */
+  h1.title { font-size: clamp(48px, 15vw, 104px); }
+  h1.title .a { color: var(--accent); }
+  h1.title .b { color: var(--fg); }
+  h1.title .s { color: var(--accent-2); }
+  .sub { font-size: clamp(16px, 4.2vw, 20px); color: var(--muted); max-width: 46ch; }
+  .spectrum {
+    display: flex; gap: 10px; flex-wrap: wrap;
+  }
+  .chip {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 999px; padding: 8px 14px; font-size: 14px; font-weight: 600;
+  }
+  .chip .emo { font-size: 18px; }
+  .warn {
+    border: 1px dashed rgba(255,45,85,.5);
+    background: rgba(255,45,85,.06);
+    border-radius: 14px; padding: 14px 16px; font-size: 14px; color: #ffb3c1;
+  }
+  .btn {
+    appearance: none; cursor: pointer; border: none;
+    font-family: "Anton", sans-serif; text-transform: uppercase; letter-spacing: 1.5px;
+    font-size: 20px; color: #140a03;
+    background: linear-gradient(180deg, var(--accent-2), var(--accent));
+    padding: 16px 22px; border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(255,90,31,.35);
+    transition: transform .12s ease, box-shadow .12s ease;
+    width: 100%;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 14px 38px rgba(255,90,31,.45); }
+  .btn:active { transform: translateY(0); }
+  .btn:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
+
+  /* --- Quiz --- */
+  .bar { height: 8px; background: var(--surface); border-radius: 999px; overflow: hidden; }
+  .bar > i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--accent-2), var(--accent)); transition: width .3s ease; }
+  .qmeta { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); font-weight: 600; letter-spacing: .5px; }
+  .question { font-size: clamp(26px, 7vw, 42px); }
+  .answers { display: flex; flex-direction: column; gap: 10px; }
+  .ans {
+    text-align: left; cursor: pointer;
+    background: var(--surface); color: var(--fg);
+    border: 1px solid var(--line); border-radius: 14px;
+    padding: 16px 18px; font-size: 16px; font-weight: 500;
+    transition: border-color .12s ease, background .12s ease, transform .08s ease;
+    font-family: inherit;
+  }
+  .ans:hover { border-color: var(--accent); background: var(--surface-2); }
+  .ans:active { transform: scale(.99); }
+  .ans:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  /* --- Result --- */
+  .result-emo { font-size: clamp(72px, 24vw, 140px); line-height: 1; filter: drop-shadow(0 8px 24px rgba(0,0,0,.5)); }
+  .verdict { font-family: "Anton", sans-serif; text-transform: uppercase; letter-spacing: 3px; font-size: 14px; }
+  .verdict.ok { color: var(--accent-2); }
+  .verdict.fail { color: var(--danger); animation: flick 1.6s steps(2) infinite; }
+  @keyframes flick { 0%, 92%, 100% { opacity: 1; } 95% { opacity: .35; } }
+  @media (prefers-reduced-motion: reduce) { .verdict.fail { animation: none; } }
+  h2.rtitle { font-size: clamp(40px, 12vw, 80px); }
+  .rtitle.ok { color: var(--accent); }
+  .rtitle.fail { color: var(--danger); }
+  .alias { font-size: clamp(18px, 5vw, 26px); font-weight: 700; }
+  .rdesc { font-size: 16px; color: var(--fg); max-width: 50ch; }
+  .rdesc .muted { display: block; margin-top: 10px; }
+  .actions { display: flex; flex-direction: column; gap: 10px; }
+  .btn.ghost {
+    background: transparent; color: var(--fg); border: 1px solid var(--line);
+    box-shadow: none; font-size: 16px;
+  }
+  .btn.ghost:hover { border-color: var(--fg); transform: none; box-shadow: none; }
+  .toast { font-size: 14px; color: var(--accent-2); font-weight: 600; min-height: 18px; }
+  footer { text-align: center; font-size: 12px; color: var(--muted); margin-top: 8px; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;900&display=swap">
+
+<div class="wrap">
+
+  <!-- INTRO -->
+  <section id="intro" class="screen">
+    <p class="eyebrow">Der wissenschaftlich fragwürdige Test</p>
+    <h1 class="title display"><span class="a">Alpha</span> <span class="b">Beta</span> <span class="s">Sigma</span></h1>
+    <p class="sub">13 Fragen. Ein brutal ehrliches Urteil. Finde heraus, wo du im Spektrum der Männlichkeit stehst – falls du überhaupt draufpasst.</p>
+    <div class="spectrum">
+      <span class="chip"><span class="emo">🦍</span> Alpha</span>
+      <span class="chip"><span class="emo">🐑</span> Beta</span>
+      <span class="chip"><span class="emo">🐺</span> Sigma</span>
+    </div>
+    <div class="warn">⚠️ Achtung: Nicht jeder landet im Spektrum. Manche fallen komplett durch – als <b>Fußleisteninspektor</b>, <b>Clitorisforscher</b> oder <b>Schnorrer</b>. Viel Erfolg.</div>
+    <button class="btn" id="start">Los geht's 🔥</button>
+    <footer>Reine Satire. Alle Ergebnisse mit einem Augenzwinkern zu genießen.</footer>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="screen" hidden>
+    <div class="qmeta">
+      <span id="counter">Frage 1 / 13</span>
+      <span id="pct">0%</span>
+    </div>
+    <div class="bar"><i id="fill"></i></div>
+    <h2 class="question display" id="qtext"></h2>
+    <div class="answers" id="answers"></div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="result" class="screen" hidden>
+    <div class="result-emo" id="remo"></div>
+    <p class="verdict" id="verdict"></p>
+    <h2 class="rtitle display" id="rtitle"></h2>
+    <p class="alias" id="ralias"></p>
+    <p class="rdesc" id="rdesc"></p>
+    <div class="actions">
+      <button class="btn" id="share">Ergebnis teilen 📣</button>
+      <button class="btn ghost" id="again">Nochmal testen ↻</button>
+    </div>
+    <p class="toast" id="toast"></p>
+  </section>
+
+</div>
+
+<script>
+  // --- Fragen: jede Antwort zählt auf genau einen Topf ---
+  // Töpfe im Spektrum: alpha, beta, sigma
+  // Töpfe außerhalb: fuss (Short King), cli (Incel), schn (Taugenichts)
+  const QUESTIONS = [
+    { q: "Dein Wecker klingelt um 5:30 Uhr. Was machst du?", a: [
+      ["Aufstehen. Disziplin schläft nicht.", "alpha"],
+      ["Snooze. Zweimal. Okay, dreimal.", "beta"],
+      ["War eh wach – habe meinen Grindset optimiert.", "sigma"],
+      ["Welcher Wecker? Mama weckt mich zum Mittagessen.", "schn"],
+    ]},
+    { q: "Im Fitnessstudio bist du der Typ, der …", a: [
+      ["… die schwersten Hanteln nimmt und laut dabei ist.", "alpha"],
+      ["… brav genau das macht, was der Trainer sagt.", "beta"],
+      ["… um 23 Uhr allein trainiert, Kopfhörer rein, Welt aus.", "sigma"],
+      ["… nur das Spiegel-Foto macht und wieder geht.", "cli"],
+    ]},
+    { q: "Beim ersten Date …", a: [
+      ["… führe ich. Ich habe den Plan.", "alpha"],
+      ["… bin ich nervös und zahle sicherheitshalber alles.", "beta"],
+      ["… entscheide ich spontan, ob ich überhaupt erscheine.", "sigma"],
+      ["Date? Ich kenne Frauen nur aus YouTube-Kommentaren.", "cli"],
+    ]},
+    { q: "Deine Körpergröße ist …", a: [
+      ["1,90 m. Blick von oben inklusive.", "alpha"],
+      ["Durchschnitt. Passt schon.", "beta"],
+      ["Egal – ich messe mich an meinem Mindset.", "sigma"],
+      ["Ich sehe als Erster, wenn die Fußleiste staubt.", "fuss"],
+    ]},
+    { q: "Deine Freunde machen Pläne ohne dich. Du …", a: [
+      ["… rufst an und übernimmst sofort die Organisation.", "alpha"],
+      ["… bist traurig, sagst aber nichts.", "beta"],
+      ["… hast eh keine Zeit. Lone-Wolf-Life.", "sigma"],
+      ["… hast keine Freunde, die Pläne machen könnten.", "cli"],
+    ]},
+    { q: "Dein Verhältnis zu Geld:", a: [
+      ["Ich verdiene es, gebe es aus, dominiere den Markt.", "alpha"],
+      ["Ich spare brav und frage lieber nochmal nach.", "beta"],
+      ["Passives Einkommen, während ihr schlaft.", "sigma"],
+      ["Haste mal 'n Zehner? Zahl ich zurück. Irgendwann.", "schn"],
+    ]},
+    { q: "Jemand rempelt dich in der Bahn an. Reaktion?", a: [
+      ["Breitbeinig stehen bleiben, Blickkontakt halten.", "alpha"],
+      ['"Oh, tut mir leid!" – obwohl er schuld war.', "beta"],
+      ["Keine Reaktion. Emotionen sind für die Masse.", "sigma"],
+      ["Ich falle um. 58 kg bei 1,63 m.", "fuss"],
+    ]},
+    { q: "Social Media ist für dich …", a: [
+      ["… die Bühne für Erfolge und Oberkörperfotos.", "alpha"],
+      ["… zum Liken und netten Kommentieren.", "beta"],
+      ["… gelöscht. Ich baue im Stillen ein Imperium.", "sigma"],
+      ["… der Kommentarbereich, wo ich Frauen das Leben erkläre.", "cli"],
+    ]},
+    { q: "Dein ideales Wochenende:", a: [
+      ["Party. Ich bin der Mittelpunkt, alle kennen meinen Namen.", "alpha"],
+      ["Gemütlich. Hauptsache, alle sind zufrieden.", "beta"],
+      ["Allein. Bücher, kalte Dusche, 4 Uhr morgens raus.", "sigma"],
+      ["Couch bei Mama. Ihr WLAN, ihr Kühlschrank.", "schn"],
+    ]},
+    { q: "Wie reagierst du auf Kritik?", a: [
+      ["Kritik? An mir? Niedlich.", "alpha"],
+      ["Ich entschuldige mich und ändere sofort alles.", "beta"],
+      ["Ich nicke – und mache danach mein Ding.", "sigma"],
+      ["Ich erkläre stundenlang, warum die Welt gegen mich ist.", "cli"],
+    ]},
+    { q: "Dein Fortbewegungsmittel sagt über dich:", a: [
+      ["PS, Lautstärke, Präsenz.", "alpha"],
+      ["Sicher, sparsam, TÜV immer pünktlich.", "beta"],
+      ["Kein Status nötig. Fahrrad, Fokus, Freiheit.", "sigma"],
+      ["Der Bus – mit dem Ticket meiner Mutter.", "schn"],
+    ]},
+    { q: "Du schaust in den Spiegel und denkst:", a: [
+      ["Was für ein Prachtexemplar.", "alpha"],
+      ["Geht schon, oder? Sag mal ehrlich.", "beta"],
+      ["Der Spiegel ist mir egal. Ich schaue nach innen.", "sigma"],
+      ["Ich muss auf die Zehenspitzen, um reinzuschauen.", "fuss"],
+    ]},
+    { q: "Was ist dein Lebensmotto?", a: [
+      ["Gewinnen. Immer. Überall.", "alpha"],
+      ["Sei nett, dann sind alle nett zu dir.", "beta"],
+      ["Vertraue niemandem. Arbeite im Schatten.", "sigma"],
+      ["Warum selbst machen, wenn's andere für mich zahlen?", "schn"],
+    ]},
+  ];
+
+  const RESULTS = {
+    alpha: { fail:false, emo:"🦍", verdict:"Im Spektrum", title:"Der Alpha", alias:"Der Rudelführer",
+      desc:"Du betrittst einen Raum und die Playlist wird automatisch lauter. Du führst, du entscheidest, du redest zuerst – und meistens auch zuletzt. Eiweißshake in der einen Hand, Lenkrad in der anderen.",
+      note:"Stärke: Präsenz. Schwäche: Du hörst „nein" ungefähr so oft wie du dehnst." },
+    beta: { fail:false, emo:"🐑", verdict:"Im Spektrum", title:"Der Beta", alias:"Der Herzensgute",
+      desc:"Du bist der netteste Mensch im Umkreis von 50 Kilometern. Du hältst Türen auf, merkst dir Geburtstage und entschuldigst dich, wenn dir jemand auf den Fuß tritt. Die Gruppe liebt dich – als Letzten, der gefragt wird.",
+      note:"Stärke: Alle vertrauen dir. Schwäche: Du traust dich selbst nicht." },
+    sigma: { fail:false, emo:"🐺", verdict:"Im Spektrum", title:"Der Sigma", alias:"Der einsame Wolf",
+      desc:"Regeln? Hierarchien? Kennst du nicht. Du machst dein Ding um 4 Uhr morgens, ohne dass es jemand mitbekommt. Social Media gelöscht, Imperium im Bau, Mindset unbesiegbar. Zumindest laut deinem eigenen Podcast.",
+      note:"Stärke: Unabhängigkeit. Schwäche: Die Grenze zwischen „einsamer Wolf" und „einfach allein" ist dünn." },
+    fuss: { fail:true, emo:"📏", verdict:"Außerhalb des Spektrums", title:"Der Short King", alias:"Der Fußleisteninspektor",
+      desc:"Herzlichen Glückwunsch – du passt nicht ins Spektrum, weil du schlicht darunter durchläufst. Als Erster weißt du, ob die Fußleisten gewischt sind, und bei Gruppenfotos stehst du immer „strategisch vorne".",
+      note:"Aber ganz ehrlich: Energie schlägt Zentimeter. Steh gerade – es sieht eh keiner." },
+    cli: { fail:true, emo:"🔬", verdict:"Außerhalb des Spektrums", title:"Der Incel", alias:"Der Clitorisforscher",
+      desc:"Du hast dich aus dem Spektrum herauskommentiert. Dein Wissen über Frauen ist rein theoretisch, akribisch aus Foren und Statistiken zusammengetragen – praktische Feldforschung steht noch aus. Für immer.",
+      note:"Vorschlag: Lass das Handy mal liegen und sag im echten Leben einfach „Hallo". Wirkt Wunder." },
+    schn: { fail:true, emo:"🛋️", verdict:"Außerhalb des Spektrums", title:"Der Taugenichts", alias:"Der Schnorrer",
+      desc:"Du bist nicht Alpha, nicht Beta, nicht Sigma – du bist auf Mamas Couch und lebst von ihrem WLAN. Warum selbst zahlen, wenn man so gut fragen kann? Dein Lebenslauf hat eine Lücke in der Form eines Sofas.",
+      note:"Gute Nachricht: Zum Taugenichts ist es nur ein kleiner Schritt zum Lebenskünstler. Steh einmal auf." },
+  };
+
+  const SPECTRUM = ["alpha","beta","sigma"];
+  const PRIORITY = ["cli","fuss","schn","alpha","sigma","beta"]; // Tie-Breaker
+
+  const el = (id) => document.getElementById(id);
+  const screens = { intro: el("intro"), quiz: el("quiz"), result: el("result") };
+  function show(name) { for (const k in screens) screens[k].hidden = (k !== name); window.scrollTo(0,0); }
+
+  let idx = 0;
+  let scores = {};
+
+  function startQuiz() {
+    idx = 0;
+    scores = { alpha:0, beta:0, sigma:0, fuss:0, cli:0, schn:0 };
+    show("quiz");
+    render();
+  }
+
+  function render() {
+    const item = QUESTIONS[idx];
+    el("counter").textContent = `Frage ${idx+1} / ${QUESTIONS.length}`;
+    const pct = Math.round((idx / QUESTIONS.length) * 100);
+    el("pct").textContent = pct + "%";
+    el("fill").style.width = pct + "%";
+    el("qtext").textContent = item.q;
+    const box = el("answers");
+    box.innerHTML = "";
+    item.a.forEach(([text, bucket]) => {
+      const b = document.createElement("button");
+      b.className = "ans";
+      b.type = "button";
+      b.textContent = text;
+      b.addEventListener("click", () => choose(bucket));
+      box.appendChild(b);
+    });
+  }
+
+  function choose(bucket) {
+    scores[bucket] = (scores[bucket] || 0) + 1;
+    idx++;
+    if (idx < QUESTIONS.length) {
+      render();
+    } else {
+      el("fill").style.width = "100%";
+      finish();
+    }
+  }
+
+  function winner() {
+    let best = null, bestVal = -1;
+    for (const key of PRIORITY) {
+      const v = scores[key] || 0;
+      if (v > bestVal) { bestVal = v; best = key; }
+    }
+    return best;
+  }
+
+  function finish() {
+    const key = winner();
+    const r = RESULTS[key];
+    el("remo").textContent = r.emo;
+    const v = el("verdict");
+    v.textContent = r.verdict;
+    v.className = "verdict " + (r.fail ? "fail" : "ok");
+    const t = el("rtitle");
+    t.textContent = r.fail ? "Durchgefallen" : r.title;
+    t.className = "rtitle display " + (r.fail ? "fail" : "ok");
+    el("ralias").textContent = r.fail ? `${r.title} · ${r.alias}` : r.alias;
+    el("rdesc").innerHTML = r.desc + `<span class="muted">${r.note}</span>`;
+    el("toast").textContent = "";
+    el("share").dataset.key = key;
+    show("result");
+  }
+
+  async function share() {
+    const key = el("share").dataset.key;
+    const r = RESULTS[key];
+    const label = r.fail ? `„${r.title} – ${r.alias}" (komplett durchgefallen 💀)` : `„${r.title} – ${r.alias}"`;
+    const text = `Ich bin ${label} im Alpha-Beta-Sigma-Test. Und du? ${location.href}`;
+    try {
+      await navigator.clipboard.writeText(text);
+      el("toast").textContent = "In die Zwischenablage kopiert ✔";
+    } catch (e) {
+      // Fallback: Text markieren
+      const ta = document.createElement("textarea");
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); el("toast").textContent = "In die Zwischenablage kopiert ✔"; }
+      catch (_) { el("toast").textContent = "Konnte nicht automatisch kopieren – Text manuell markieren."; }
+      ta.remove();
+    }
+  }
+
+  el("start").addEventListener("click", startQuiz);
+  el("again").addEventListener("click", () => show("intro"));
+  el("share").addEventListener("click", share);
+</script>
