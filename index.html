@@ -1,8 +1,16 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Alpha Beta Sigma</title>
-<meta name="description" content="Bist du Alpha, Beta oder Sigma? Oder fällst du komplett aus dem Spektrum?">
+<meta name="description" content="Bist du Alpha, Beta oder Sigma? Finde es heraus.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;900&display=swap">
 <style>
   /* Layout: einspaltiges, zentriertes Quiz auf dunklem "Testosteron-Poster"-Grund,
-     ein Screen zur Zeit (Intro → Frage → Ergebnis), große kondensierte Headlines. */
+     ein Screen zur Zeit (Intro -> Frage -> Ergebnis), große kondensierte Headlines. */
   :root {
     --bg: #0a0a0d;
     --surface: #15151e;
@@ -17,8 +25,8 @@
     --maxw: 640px;
   }
   * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
   body {
-    margin: 0;
     background:
       radial-gradient(1200px 600px at 50% -10%, rgba(255,90,31,.14), transparent 60%),
       radial-gradient(900px 500px at 50% 120%, rgba(255,45,85,.08), transparent 55%),
@@ -26,9 +34,10 @@
     color: var(--fg);
     font-family: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
     line-height: 1.5;
-    min-height: 100%;
     -webkit-font-smoothing: antialiased;
   }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
   .wrap {
     max-width: var(--maxw);
     margin: 0 auto;
@@ -55,6 +64,7 @@
     letter-spacing: 3px;
     font-size: 13px;
     color: var(--accent);
+    margin: 0;
   }
   .muted { color: var(--muted); }
 
@@ -68,21 +78,14 @@
   h1.title .a { color: var(--accent); }
   h1.title .b { color: var(--fg); }
   h1.title .s { color: var(--accent-2); }
-  .sub { font-size: clamp(16px, 4.2vw, 20px); color: var(--muted); max-width: 46ch; }
-  .spectrum {
-    display: flex; gap: 10px; flex-wrap: wrap;
-  }
+  .sub { font-size: clamp(16px, 4.2vw, 20px); color: var(--muted); max-width: 46ch; margin: 0; }
+  .spectrum { display: flex; gap: 10px; flex-wrap: wrap; }
   .chip {
     display: flex; align-items: center; gap: 8px;
     background: var(--surface); border: 1px solid var(--line);
     border-radius: 999px; padding: 8px 14px; font-size: 14px; font-weight: 600;
   }
   .chip .emo { font-size: 18px; }
-  .warn {
-    border: 1px dashed rgba(255,45,85,.5);
-    background: rgba(255,45,85,.06);
-    border-radius: 14px; padding: 14px 16px; font-size: 14px; color: #ffb3c1;
-  }
   .btn {
     appearance: none; cursor: pointer; border: none;
     font-family: "Anton", sans-serif; text-transform: uppercase; letter-spacing: 1.5px;
@@ -117,7 +120,7 @@
 
   /* --- Result --- */
   .result-emo { font-size: clamp(72px, 24vw, 140px); line-height: 1; filter: drop-shadow(0 8px 24px rgba(0,0,0,.5)); }
-  .verdict { font-family: "Anton", sans-serif; text-transform: uppercase; letter-spacing: 3px; font-size: 14px; }
+  .verdict { font-family: "Anton", sans-serif; text-transform: uppercase; letter-spacing: 3px; font-size: 14px; margin: 0; }
   .verdict.ok { color: var(--accent-2); }
   .verdict.fail { color: var(--danger); animation: flick 1.6s steps(2) infinite; }
   @keyframes flick { 0%, 92%, 100% { opacity: 1; } 95% { opacity: .35; } }
@@ -125,8 +128,8 @@
   h2.rtitle { font-size: clamp(40px, 12vw, 80px); }
   .rtitle.ok { color: var(--accent); }
   .rtitle.fail { color: var(--danger); }
-  .alias { font-size: clamp(18px, 5vw, 26px); font-weight: 700; }
-  .rdesc { font-size: 16px; color: var(--fg); max-width: 50ch; }
+  .alias { font-size: clamp(18px, 5vw, 26px); font-weight: 700; margin: 0; }
+  .rdesc { font-size: 16px; color: var(--fg); max-width: 50ch; margin: 0; }
   .rdesc .muted { display: block; margin-top: 10px; }
   .actions { display: flex; flex-direction: column; gap: 10px; }
   .btn.ghost {
@@ -134,28 +137,23 @@
     box-shadow: none; font-size: 16px;
   }
   .btn.ghost:hover { border-color: var(--fg); transform: none; box-shadow: none; }
-  .toast { font-size: 14px; color: var(--accent-2); font-weight: 600; min-height: 18px; }
-  footer { text-align: center; font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .toast { font-size: 14px; color: var(--accent-2); font-weight: 600; min-height: 18px; margin: 0; }
 </style>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;900&display=swap">
-
+</head>
+<body>
 <div class="wrap">
 
   <!-- INTRO -->
   <section id="intro" class="screen">
     <p class="eyebrow">Der wissenschaftlich fragwürdige Test</p>
     <h1 class="title display"><span class="a">Alpha</span> <span class="b">Beta</span> <span class="s">Sigma</span></h1>
-    <p class="sub">13 Fragen. Ein brutal ehrliches Urteil. Finde heraus, wo du im Spektrum der Männlichkeit stehst – falls du überhaupt draufpasst.</p>
+    <p class="sub">13 Fragen. Ein brutal ehrliches Urteil. Finde heraus, wo du im Spektrum der Männlichkeit stehst.</p>
     <div class="spectrum">
       <span class="chip"><span class="emo">🦍</span> Alpha</span>
       <span class="chip"><span class="emo">🐑</span> Beta</span>
       <span class="chip"><span class="emo">🐺</span> Sigma</span>
     </div>
-    <div class="warn">⚠️ Achtung: Nicht jeder landet im Spektrum. Manche fallen komplett durch – als <b>Fußleisteninspektor</b>, <b>Clitorisforscher</b> oder <b>Schnorrer</b>. Viel Erfolg.</div>
     <button class="btn" id="start">Los geht's 🔥</button>
-    <footer>Reine Satire. Alle Ergebnisse mit einem Augenzwinkern zu genießen.</footer>
   </section>
 
   <!-- QUIZ -->
@@ -187,8 +185,7 @@
 
 <script>
   // --- Fragen: jede Antwort zählt auf genau einen Topf ---
-  // Töpfe im Spektrum: alpha, beta, sigma
-  // Töpfe außerhalb: fuss (Short King), cli (Incel), schn (Taugenichts)
+  // Spektrum: alpha, beta, sigma | Außerhalb: fuss (Short King), cli (Incel), schn (Taugenichts)
   const QUESTIONS = [
     { q: "Dein Wecker klingelt um 5:30 Uhr. Was machst du?", a: [
       ["Aufstehen. Disziplin schläft nicht.", "alpha"],
@@ -273,25 +270,24 @@
   const RESULTS = {
     alpha: { fail:false, emo:"🦍", verdict:"Im Spektrum", title:"Der Alpha", alias:"Der Rudelführer",
       desc:"Du betrittst einen Raum und die Playlist wird automatisch lauter. Du führst, du entscheidest, du redest zuerst – und meistens auch zuletzt. Eiweißshake in der einen Hand, Lenkrad in der anderen.",
-      note:"Stärke: Präsenz. Schwäche: Du hörst „nein" ungefähr so oft wie du dehnst." },
+      note:"Stärke: Präsenz. Schwäche: Du hörst „nein\" ungefähr so oft wie du dehnst." },
     beta: { fail:false, emo:"🐑", verdict:"Im Spektrum", title:"Der Beta", alias:"Der Herzensgute",
       desc:"Du bist der netteste Mensch im Umkreis von 50 Kilometern. Du hältst Türen auf, merkst dir Geburtstage und entschuldigst dich, wenn dir jemand auf den Fuß tritt. Die Gruppe liebt dich – als Letzten, der gefragt wird.",
       note:"Stärke: Alle vertrauen dir. Schwäche: Du traust dich selbst nicht." },
     sigma: { fail:false, emo:"🐺", verdict:"Im Spektrum", title:"Der Sigma", alias:"Der einsame Wolf",
       desc:"Regeln? Hierarchien? Kennst du nicht. Du machst dein Ding um 4 Uhr morgens, ohne dass es jemand mitbekommt. Social Media gelöscht, Imperium im Bau, Mindset unbesiegbar. Zumindest laut deinem eigenen Podcast.",
-      note:"Stärke: Unabhängigkeit. Schwäche: Die Grenze zwischen „einsamer Wolf" und „einfach allein" ist dünn." },
+      note:"Stärke: Unabhängigkeit. Schwäche: Die Grenze zwischen „einsamer Wolf\" und „einfach allein\" ist dünn." },
     fuss: { fail:true, emo:"📏", verdict:"Außerhalb des Spektrums", title:"Der Short King", alias:"Der Fußleisteninspektor",
-      desc:"Herzlichen Glückwunsch – du passt nicht ins Spektrum, weil du schlicht darunter durchläufst. Als Erster weißt du, ob die Fußleisten gewischt sind, und bei Gruppenfotos stehst du immer „strategisch vorne".",
+      desc:"Überraschung – du passt nicht ins Spektrum, weil du schlicht darunter durchläufst. Als Erster weißt du, ob die Fußleisten gewischt sind, und bei Gruppenfotos stehst du immer „strategisch vorne\".",
       note:"Aber ganz ehrlich: Energie schlägt Zentimeter. Steh gerade – es sieht eh keiner." },
     cli: { fail:true, emo:"🔬", verdict:"Außerhalb des Spektrums", title:"Der Incel", alias:"Der Clitorisforscher",
-      desc:"Du hast dich aus dem Spektrum herauskommentiert. Dein Wissen über Frauen ist rein theoretisch, akribisch aus Foren und Statistiken zusammengetragen – praktische Feldforschung steht noch aus. Für immer.",
-      note:"Vorschlag: Lass das Handy mal liegen und sag im echten Leben einfach „Hallo". Wirkt Wunder." },
+      desc:"Überraschung – du hast dich aus dem Spektrum herauskommentiert. Dein Wissen über Frauen ist rein theoretisch, akribisch aus Foren und Statistiken zusammengetragen. Praktische Feldforschung steht noch aus. Für immer.",
+      note:"Vorschlag: Lass das Handy mal liegen und sag im echten Leben einfach „Hallo\". Wirkt Wunder." },
     schn: { fail:true, emo:"🛋️", verdict:"Außerhalb des Spektrums", title:"Der Taugenichts", alias:"Der Schnorrer",
-      desc:"Du bist nicht Alpha, nicht Beta, nicht Sigma – du bist auf Mamas Couch und lebst von ihrem WLAN. Warum selbst zahlen, wenn man so gut fragen kann? Dein Lebenslauf hat eine Lücke in der Form eines Sofas.",
-      note:"Gute Nachricht: Zum Taugenichts ist es nur ein kleiner Schritt zum Lebenskünstler. Steh einmal auf." },
+      desc:"Überraschung – du bist nicht Alpha, nicht Beta, nicht Sigma. Du bist auf Mamas Couch und lebst von ihrem WLAN. Warum selbst zahlen, wenn man so gut fragen kann? Dein Lebenslauf hat eine Lücke in Form eines Sofas.",
+      note:"Gute Nachricht: Vom Taugenichts ist es nur ein kleiner Schritt zum Lebenskünstler. Steh einmal auf." },
   };
 
-  const SPECTRUM = ["alpha","beta","sigma"];
   const PRIORITY = ["cli","fuss","schn","alpha","sigma","beta"]; // Tie-Breaker
 
   const el = (id) => document.getElementById(id);
@@ -373,7 +369,6 @@
       await navigator.clipboard.writeText(text);
       el("toast").textContent = "In die Zwischenablage kopiert ✔";
     } catch (e) {
-      // Fallback: Text markieren
       const ta = document.createElement("textarea");
       ta.value = text; document.body.appendChild(ta); ta.select();
       try { document.execCommand("copy"); el("toast").textContent = "In die Zwischenablage kopiert ✔"; }
@@ -386,3 +381,5 @@
   el("again").addEventListener("click", () => show("intro"));
   el("share").addEventListener("click", share);
 </script>
+</body>
+</html>
